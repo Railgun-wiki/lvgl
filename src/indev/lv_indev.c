@@ -1920,8 +1920,10 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
         }
     }
 
-    lv_obj_send_event(indev_obj_act, code, param);
-    if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+    if(indev_obj_act) {
+        lv_obj_send_event(indev_obj_act, code, param);
+        if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+    }
 
     return LV_RESULT_OK;
 }
