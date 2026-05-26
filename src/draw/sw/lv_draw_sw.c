@@ -410,9 +410,11 @@ static void execute_drawing(lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_line_iterate(t, t->draw_dsc, lv_draw_sw_line);
             break;
+#if LV_DRAW_SW_COMPLEX
         case LV_DRAW_TASK_TYPE_BLUR:
             lv_draw_sw_blur(t, t->draw_dsc, &t->area);
             break;
+#endif
         case LV_DRAW_TASK_TYPE_TRIANGLE:
             lv_draw_sw_triangle(t, t->draw_dsc);
             break;
