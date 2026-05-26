@@ -881,53 +881,10 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
         }
     }
     else {
-        uint16_t res = 0;
-        for(y = 0; y < h; y++) {
-            lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
-            lv_color16_t * src_buf_c16 = (lv_color16_t *) src_buf_u16;
-            for(x = 0; x < w; x++) {
-                switch(dsc->blend_mode) {
-                    case LV_BLEND_MODE_ADDITIVE:
-                        if(src_buf_u16[x] == 0x0000) continue;   /*Do not add pure black*/
-                        res = (LV_MIN(dest_buf_c16[x].red + src_buf_c16[x].red, 31)) << 11;
-                        res += (LV_MIN(dest_buf_c16[x].green + src_buf_c16[x].green, 63)) << 5;
-                        res += LV_MIN(dest_buf_c16[x].blue + src_buf_c16[x].blue, 31);
-                        break;
-                    case LV_BLEND_MODE_SUBTRACTIVE:
-                        if(src_buf_u16[x] == 0x0000) continue;   /*Do not subtract pure black*/
-                        res = (LV_MAX(dest_buf_c16[x].red - src_buf_c16[x].red, 0)) << 11;
-                        res += (LV_MAX(dest_buf_c16[x].green - src_buf_c16[x].green, 0)) << 5;
-                        res += LV_MAX(dest_buf_c16[x].blue - src_buf_c16[x].blue, 0);
-                        break;
-                    case LV_BLEND_MODE_MULTIPLY:
-                        if(src_buf_u16[x] == 0xffff) continue;   /*Do not multiply with pure white (considered as 1)*/
-                        res = ((dest_buf_c16[x].red * src_buf_c16[x].red) >> 5) << 11;
-                        res += ((dest_buf_c16[x].green * src_buf_c16[x].green) >> 6) << 5;
-                        res += (dest_buf_c16[x].blue * src_buf_c16[x].blue) >> 5;
-                        break;
-                    case LV_BLEND_MODE_DIFFERENCE:
-                        res = (LV_ABS(dest_buf_c16[x].red - src_buf_c16[x].red)) << 11;
-                        res += (LV_ABS(dest_buf_c16[x].green - src_buf_c16[x].green)) << 5;
-                        res += LV_ABS(dest_buf_c16[x].blue - src_buf_c16[x].blue);
-                        break;
-                    default:
-                        LV_LOG_WARN("Not supported blend mode: %d", dsc->blend_mode);
-                        return;
-                }
-
-                if(mask_buf == NULL) {
-                    dest_buf_u16[x] = lv_color_16_16_mix(res, dest_buf_u16[x], opa);
-                }
-                else {
-                    if(opa >= LV_OPA_MAX) dest_buf_u16[x] = lv_color_16_16_mix(res, dest_buf_u16[x], mask_buf[x]);
-                    else dest_buf_u16[x] = lv_color_16_16_mix(res, dest_buf_u16[x], LV_OPA_MIX2(mask_buf[x], opa));
-                }
-            }
-
-            dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
-            src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
-            if(mask_buf) mask_buf += mask_stride;
-        }
+        /* Non-NORMAL blend modes (ADDITIVE/SUBTRACTIVE/MULTIPLY/DIFFERENCE)
+         * disabled for Flash optimization. BMS UI only uses NORMAL blend. */
+        LV_UNUSED(dsc);
+        return;
     }
 }
 
