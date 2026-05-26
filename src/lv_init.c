@@ -216,7 +216,11 @@ void lv_init(void)
 
     lv_timer_core_init();
 
+#if LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 \
+    || LV_USE_FS_FATFS || LV_USE_FS_LITTLEFS || LV_USE_FS_MEMFS \
+    || LV_USE_FS_CDROM || LV_USE_FS_RAWFS
     lv_fs_init();
+#endif
 
     lv_layout_init();
 
@@ -294,8 +298,10 @@ void lv_init(void)
     lv_sysmon_builtin_init();
 #endif
 
+#if LV_USE_IMAGE
     lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
+#endif
 
 #if LV_USE_DRAW_VG_LITE
     lv_draw_vg_lite_init();
